@@ -1,0 +1,72 @@
+{%extends "base.html" %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard | Baccabiu</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Dashboard Content -->
+        <section class="content-area">
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Items</h3>
+                    <p id="totalItems">0</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Total Quantity</h3>
+                    <p id="totalQuantity">0</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Total Value (NPR)</h3>
+                    <p id="totalNPR">0</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Total Value (USD)</h3>
+                    <p id="totalUSD">0</p>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h2>Quick Actions</h2>
+                <div class="action-grid">
+                    <a href="{% url 'stockIn' %}" class="action-card">➕ Add Item</a>
+                    <a href="{% url 'viewInventory' %}" class="action-card">📦 View Inventory</a>
+                    <a href="{% url 'stockOut' %}" class="action-card">⬇️ Stock Out</a>
+                    <a href="{% url 'history' %}" class="action-card">🕘 Transaction History</a>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="recent-activity">
+                <h2>Recent Activity</h2>
+                <ul>
+                    <li>Added new item: ITM004 – Keyboard</li>
+                    <li>Updated quantity: ITM002 – Mouse</li>
+                    <li>Generated stock report</li>
+            </div>
+
+        </section>
+
+    </main>
+</div>
+
+</body>
+</html>
+
+{% endblock %}

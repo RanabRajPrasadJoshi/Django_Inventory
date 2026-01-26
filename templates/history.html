@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/history.css' %}">
+<main class="main-content">
+    <section class="content-area">
+
+        <div class="content-header">
+            <h2>Stock History</h2>
+            <span>Search using code: <input type="search" name="" id=""placeholder="HJ12jK"></span>
+            <div class="stock_option">
+                Added For: 
+                <select name="" id="">
+                    <option value="all">All</option>
+                    <option value="baccabiu">Baccabiu Stock History</option>
+                    <option value="others">Others Stock History</option>
+                </select>
+            </div>
+            <button class="reset-button" onclick="resetFilters()">Reset Filters</button>
+        </div>
+
+        <div class="table-wrapper">
+            <table id="historyTable">
+                <thead>
+                    <tr>
+                        {% comment %} Filter button example for SN {% endcomment %}
+                        <th>
+                            SN
+                            <div class="filter-dropdown" data-index="0">
+                                <button class="filter-button" onclick="toggleDropdown(event)">Filter</button>
+                                <div class="dropdown-content">
+                                    <label><input type="checkbox" value="">All</label>
+                                </div>
+                            </div>
+                        </th>
+                        <th>Code</th>
+                        <th>Category</th>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Market Price</th>
+                        <th>Total (Market)</th>
+                        <th>Cost Price</th>
+                        <th>Total (Cost)</th>
+                        <th>Received Date</th>
+                        <th>Status</th>
+                        <th>Remark</th>
+                        <th>Supplier</th>
+                        <th>Imported For</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Example row -->
+                    <tr>
+                        <td data-label="SN">1</td>
+                        <td data-label="Code">PRD001</td>
+                        <td data-label="Category">Electronics</td>
+                        <td data-label="Product Name">Laptop</td>
+                        <td data-label="Quantity">5</td>
+                        <td data-label="Market Price">120000</td>
+                        <td data-label="Total (Market)">600000</td>
+                        <td data-label="Cost Price">110000</td>
+                        <td data-label="Total (Cost)">550000</td>
+                        <td data-label="Received Date">2026-01-22</td>
+                        <td data-label="Status">IN</td>
+                        <td data-label="Remark">New stock</td>
+                        <td data-label="Supplier">Tech Nepal</td>
+                        <td data-label="Imported For">Office</td>
+                        
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" class="total-label">Total</td>
+                        <td id="totalQuantity"></td>
+                        <td>-</td>
+                        <td id="totalMarket"></td>
+                        <td>-</td>
+                        <td id="totalCost"></td>
+                        <td colspan="7"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="card-container" id="cardContainer">
+            <!-- Cards injected via JS -->
+        </div>
+
+    </section>
+</main>
+
+<script src="{% static 'js/history.js' %}"></script>
+{% endblock %}

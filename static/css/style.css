@@ -1,0 +1,83 @@
+
+/* Content */
+.content-area {
+    padding: 20px;
+}
+
+/* Stats */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+}
+
+.stat-card {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.stat-card h3 {
+    margin: 0;
+    font-size: 15px;
+    color: #64748b;
+}
+
+.stat-card p {
+    margin: 10px 0 0;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* Quick Actions */
+.quick-actions {
+    margin-top: 30px;
+}
+
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-top: 14px;
+}
+
+.action-card {
+    background: #3b82f6;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 18px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.action-card:hover {
+    background: #2563eb;
+}
+
+/* Recent Activity */
+.recent-activity {
+    margin-top: 30px;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.recent-activity h2 {
+    margin-top: 0;
+}
+
+.recent-activity ul {
+    padding-left: 18px;
+}
+
+.recent-activity li {
+    margin-bottom: 8px;
+    color: #475569;
+}
+
+/* Responsive */
+

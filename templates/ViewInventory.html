@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+
+
+   {% block content %}
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Inventory | Baccabiu</title>
+    <link rel="stylesheet" href="{% static 'css/ViewInventory.css' %}">
+    
+</head>
+<body>
+    <!-- Main -->
+     
+    <main class="main-content">
+        <section class="content-area">
+
+            <div class="content-header">
+                <h2>Item List</h2>
+                <span>Search using code: <input type="search" name="" id="" placeholder="HJ12jK"></span>
+                <button class="reset-button" onclick="resetFilters()">Reset Filters</button>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="itemTable">
+                    <thead>
+                        <tr>
+                            
+                            <th>
+                                
+                                <div class="filter-dropdown" data-index="{{ forloop.counter0 }}">
+                                    <button class="filter-button" onclick="toggleDropdown(event)">Filter</button>
+                                    <div class="dropdown-content">
+                                        <label><input type="checkbox" value="">All</label>
+                                    </div>
+                                </div>
+                            </th>
+                            <th>Code</th>
+                            <th>Category</th>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>Market Price</th>
+                            <th>Total (Market)</th>
+                            <th>Cost Price</th>
+                            <th>Total (Cost)</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" class="total-label">Total</td>
+                            <td id="totalQuantity"></td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td id="totalNPR"></td>
+                            <td id="totalUSD"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Mobile Cards -->
+            <div class="card-container" id="cardContainer">
+                <!-- Cards injected via JS -->
+            </div>
+
+        </section>
+
+    </main>
+</div>
+
+<script src="{% static 'js/inventory.js' %}"></script>
+</body>
+{% endblock %}
+</html>

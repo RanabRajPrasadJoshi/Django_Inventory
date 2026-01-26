@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock In | Baccabiu</title>
+    <link rel="stylesheet" href="{% static 'css/stockadd.css' %}">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- Sidebar -->
+
+
+    <!-- Main -->
+    <main class="main-content">
+
+
+        <!-- Content -->
+        <section class="content-area">
+
+            <div class="form-card">
+                <h2>Stock In Form</h2>
+                <p class="subtitle">Record incoming stock details</p>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="form-grid">
+
+                        <!-- Code -->
+                        <div class="form-group">
+                            <label>Code</label>
+                            <input type="text" name="code" required>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="form-group">
+                            <label>Category</label>
+                            <input type="text" name="category" required>
+                        </div>
+
+                        <!-- Product Name -->
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input type="text" name="product_name" required>
+                        </div>
+
+                        <!-- Quantity -->
+                        <div class="form-group">
+                            <label>Quantity</label>
+                            <input type="number" name="quantity" min="1" required>
+                        </div>
+
+                        <!-- Market Price -->
+                        <div class="form-group">
+                            <label>Market Price</label>
+                            <input type="number" step="0.01" name="market_price" id="marketPrice" required>
+                        </div>
+
+                        <!-- Total (Market) -->
+                        <div class="form-group">
+                            <label>Total (Market)</label>
+                            <input type="number" step="0.01" name="total_market" id="totalMarket" readonly>
+                        </div>
+
+                        <!-- Cost Price -->
+                        <div class="form-group">
+                            <label>Cost Price</label>
+                            <input type="number" step="0.01" name="cost_price" id="costPrice" required>
+                        </div>
+
+                        <!-- Total (Cost) -->
+                        <div class="form-group">
+                            <label>Total (Cost)</label>
+                            <input type="number" step="0.01" name="total_cost" id="totalCost" readonly>
+                        </div>
+
+                        <!-- Received Date -->
+                        <div class="form-group">
+                            <label>Received Date</label>
+                            <input type="date" name="received_date" required>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select name="status">
+                                <option value="In Stock">In Stock</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Damaged">Damaged</option>
+                            </select>
+                        </div>
+
+                        <!-- Remark -->
+                        <div class="form-group full-width">
+                            <label>Remark</label>
+                            <textarea name="remark" rows="3"></textarea>
+                        </div>
+
+                        <!-- Supplier -->
+                        <div class="form-group">
+                            <label>Supplier</label>
+                            <input type="text" name="supplier">
+                        </div>
+
+                        <!-- Imported For -->
+                        <div class="form-group">
+                            <label>Imported For</label>
+                            <input type="text" name="imported_for">
+                        </div>
+
+                        <!-- From -->
+                        <div class="form-group">
+                            <label>From</label>
+                            <input type="text" name="from_location">
+                        </div>
+
+                        <!-- To -->
+                        <div class="form-group">
+                            <label>To</label>
+                            <input type="text" name="to_location">
+                        </div>
+
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="reset" class="btn-secondary">Clear</button>
+                        <button type="submit" class="btn-primary">Save Stock In</button>
+                    </div>
+
+                </form>
+            </div>
+
+        </section>
+
+    </main>
+</div>
+
+<script src="{% static 'js/stockin.js' %}"></script>
+</body>
+</html>
+
+{% endblock %}
