@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% load static %}
-
 {% block content %}
 <!DOCTYPE html>
 <html lang="en">
@@ -26,11 +25,49 @@
             <div class="form-card">
                 <h2>Stock In Form</h2>
                 <p class="subtitle">Record incoming stock details</p>
+                {% if warning %}
+<div style="background:#ffe0e0; color:#a00; padding:15px; border-radius:8px; margin-bottom:15px;">
+    ⚠ Similar product exists. Please verify:
+    <ul>
+    {% for p in warning %}
+        <li>{{ p.product_code }} | {{ p.product_name }} | {{ p.category }}</li>
+    {% endfor %}
+    </ul>
+
+    <form method="post">
+        {% csrf_token %}
+        <!-- Hidden fields to resend the original form data -->
+        {% for key, value in form_data.items %}
+            <input type="hidden" name="{{ key }}" value="{{ value }}">
+        {% endfor %}
+
+        <!-- Hidden field to force creation -->
+        <input type="hidden" name="force_create" value="true">
+
+        <button type="submit" style="margin-right:10px; padding:8px 15px; background:#28a745; color:white; border:none; border-radius:5px;">
+            ✅ Confirm
+        </button>
+
+        <button type="button" onclick="window.history.back();" style="padding:8px 15px; background:#dc3545; color:white; border:none; border-radius:5px;">
+            ❌ Cancel
+        </button>
+    </form>
+</div>
+{% endif %}
 
                 <form method="post">
                     {% csrf_token %}
 
                     <div class="form-grid">
+                        
+                         <div class="form-group" style="grid-column: span 1; margin-bottom: 20px;   ">
+                            <label>Status</label>
+                            <select name="status">
+                                <option value="now_stock">New Stock</option>
+                                <option value="sold_out">Sold out</option>
+                                <option value="stock_transfer">Stock Transfer</option>
+                            </select>
+                        </div>
 
                         <!-- Code -->
                         <div class="form-group">
@@ -41,7 +78,14 @@
                         <!-- Category -->
                         <div class="form-group">
                             <label>Category</label>
-                            <input type="text" name="category" required>
+                            <select name="category">
+                                <option value="" disabled selected>Select Category</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.category_name }}">{{ category.category_name }}</option>
+                                {% endfor %}
+                                
+                                
+                            </select>
                         </div>
 
                         <!-- Product Name -->
@@ -87,45 +131,66 @@
                         </div>
 
                         <!-- Status -->
+                       
+
+                        
+                        <!-- Supplier -->
                         <div class="form-group">
-                            <label>Status</label>
-                            <select name="status">
-                                <option value="In Stock">In Stock</option>
-                                <option value="Pending">Pending</option>
-                                <option value="Damaged">Damaged</option>
+                            <label>Supplier: </label>
+                            <select name="supplier">
+                                <option value="" disabled selected>Select Supplier</option>
+                                {% for supplier in suppliers %}
+                                    <option value="{{ supplier.supplier_name }}">{{ supplier.supplier_name }}</option>
+                                {% endfor %}
+                                
+                                
                             </select>
                         </div>
-
+                        
+                        <!-- Imported For -->
+                        <div class="form-group">
+                            <label>Imported For</label>
+                            <select name="imported_for">
+                                <option value="" disabled selected>Imported For</option>
+                                {% for imported in imported_for %}
+                                    <option value="{{ imported.imported_for }}">{{ imported.imported_for }}</option>
+                                {% endfor %}
+                                
+                                
+                            </select>
+                        </div>
+                        
+                        <!-- From -->
+                        <div class="form-group">
+                            <label>From</label>
+                            <select name="from_location">
+                                <option value="" disabled selected>From</option>
+                                {% for store in stores %}
+                                    <option value="{{ store.store_name }}">{{ store.store_name }}</option>
+                                {% endfor %}
+                                
+                                
+                            </select>
+                        </div>
+                        
+                        <!-- To -->
+                        <div class="form-group">
+                            <label>To</label>
+                            <select name="to_location">
+                                <option value="" disabled selected>To</option>
+                                {% for store in stores %}
+                                    <option value="{{ store.store_name }}">{{ store.store_name }}</option>
+                                {% endfor %}
+                                
+                                
+                            </select>
+                        </div>
+                        
                         <!-- Remark -->
                         <div class="form-group full-width">
                             <label>Remark</label>
                             <textarea name="remark" rows="3"></textarea>
                         </div>
-
-                        <!-- Supplier -->
-                        <div class="form-group">
-                            <label>Supplier</label>
-                            <input type="text" name="supplier">
-                        </div>
-
-                        <!-- Imported For -->
-                        <div class="form-group">
-                            <label>Imported For</label>
-                            <input type="text" name="imported_for">
-                        </div>
-
-                        <!-- From -->
-                        <div class="form-group">
-                            <label>From</label>
-                            <input type="text" name="from_location">
-                        </div>
-
-                        <!-- To -->
-                        <div class="form-group">
-                            <label>To</label>
-                            <input type="text" name="to_location">
-                        </div>
-
                     </div>
 
                     <div class="form-actions">
@@ -141,7 +206,113 @@
     </main>
 </div>
 
-<script src="{% static 'js/stockin.js' %}"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const statusSelect = document.querySelector('select[name="status"]');
+
+    const fields = {
+    code: document.querySelector('input[name="code"]').closest('.form-group'),
+    category: document.querySelector('select[name="category"]').closest('.form-group'),
+    product_name: document.querySelector('input[name="product_name"]').closest('.form-group'),
+    quantity: document.querySelector('input[name="quantity"]').closest('.form-group'),
+    market_price: document.getElementById("marketPrice").closest('.form-group'),
+    total_market: document.getElementById("totalMarket").closest('.form-group'),
+    cost_price: document.getElementById("costPrice").closest('.form-group'),
+    total_cost: document.getElementById("totalCost").closest('.form-group'),
+    received_date: document.querySelector('input[name="received_date"]').closest('.form-group'),
+    remark: document.querySelector('textarea[name="remark"]').closest('.form-group'),
+
+    supplier: document.querySelector('select[name="supplier"]').closest('.form-group'),
+    imported_for: document.querySelector('select[name="imported_for"]').closest('.form-group'),
+    from_location: document.querySelector('select[name="from_location"]').closest('.form-group'),
+    to_location: document.querySelector('select[name="to_location"]').closest('.form-group'),
+};
+
+
+
+
+
+    function showAll() {
+        Object.values(fields).forEach(f => f.style.display = "");
+    }
+
+    function hide(...names) {
+        names.forEach(name => {
+            if (fields[name]) fields[name].style.display = "none";
+        });
+    }
+
+    
+    function setRequired(name, isRequired) {
+    const el = document.querySelector(`[name="${name}"]`);
+    if (!el) return;
+    if (isRequired) el.setAttribute("required", "required");
+    else el.removeAttribute("required");
+}
+
+
+   function handleStatus() {
+    const status = statusSelect.value;
+    showAll();
+
+    // default requirements
+    setRequired("market_price", true);
+    setRequired("cost_price", true);
+    setRequired("from_location", true);
+    setRequired("to_location", true);
+
+    if (status === "now_stock") {
+        hide("from_location");
+        setRequired("from_location", false);
+    }
+
+    if (status === "sold_out") {
+        hide(
+            "cost_price",
+            "total_cost",
+            "supplier",
+            "imported_for",
+            "to_location"
+        );
+        setRequired("cost_price", false);
+        setRequired("market_price", false);
+        setRequired("to_location", false);
+    }
+
+    if (status === "stock_transfer") {
+        hide("supplier", "imported_for");
+    }
+}
+
+    statusSelect.addEventListener("change", handleStatus);
+    handleStatus();
+
+
+
+    // ================= TOTAL CALC =================
+
+    const quantityInput = document.querySelector('input[name="quantity"]');
+    const marketPriceInput = document.getElementById("marketPrice");
+    const totalMarketInput = document.getElementById("totalMarket");
+    const costPriceInput = document.getElementById("costPrice");
+    const totalCostInput = document.getElementById("totalCost");
+
+    function calculateTotals() {
+        const quantity = parseFloat(quantityInput.value) || 0;
+        const marketPrice = parseFloat(marketPriceInput.value) || 0;
+        const costPrice = parseFloat(costPriceInput.value) || 0;
+
+        totalMarketInput.value = (quantity * marketPrice).toFixed(2);
+        totalCostInput.value = (quantity * costPrice).toFixed(2);
+    }
+
+    quantityInput.addEventListener("input", calculateTotals);
+    marketPriceInput.addEventListener("input", calculateTotals);
+    costPriceInput.addEventListener("input", calculateTotals);
+});
+</script>
+
+
 </body>
 </html>
 

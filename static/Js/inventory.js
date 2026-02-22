@@ -21,31 +21,71 @@ function resetFilters() {
     alert("Filters reset (connect logic here)");
 }
 
-/* Optional demo data */
-const sampleData = [
-    [1, "ITM001", "Laptop", "Store A", 3, 80000, 6, 240000, 1800],
-    [2, "ITM002", "Mouse", "Store B", 10, 1200, 9, 12000, 90]
-];
 
-const tbody = document.querySelector("#itemTable tbody");
-const cardContainer = document.getElementById("cardContainer");
 
-sampleData.forEach(row => {
-    const tr = document.createElement("tr");
-    row.forEach((cell, i) => {
-        const td = document.createElement("td");
-        td.innerText = cell;
-        tr.appendChild(td);
+
+document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("searchInput");
+    const table = document.getElementById("itemTable");
+    const rows = table.querySelectorAll("tbody tr");
+
+    const totalQty = document.getElementById("totalQuantity");
+    const totalMarket = document.getElementById("totalMarket");
+    const totalCost = document.getElementById("totalCost");
+
+    // ================= TOTALS =================
+    function calculateTotals() {
+        let qty = 0, mp = 0, cp = 0;
+
+        rows.forEach(row => {
+            if (row.style.display !== "none") {
+                qty += parseFloat(row.cells[5].innerText) || 0;
+                mp += parseFloat(row.cells[7].innerText) || 0;
+                cp += parseFloat(row.cells[9].innerText) || 0;
+            }
+        });
+
+        totalQty.innerText = qty;
+        totalMarket.innerText = mp.toFixed(2);
+        totalCost.innerText = cp.toFixed(2);
+    }
+
+    calculateTotals();
+
+    // ================= SEARCH =================
+    searchInput.addEventListener("keyup", function () {
+        const value = this.value.toLowerCase();
+
+        rows.forEach(row => {
+            row.style.display = row.innerText.toLowerCase().includes(value)
+                ? ""
+                : "none";
+        });
+
+        calculateTotals();
     });
-    tbody.appendChild(tr);
 
-    const card = document.createElement("div");
-    card.className = "inventory-card";
-    const labels = ["SN","Code","Category","Location","Quantity","NPR Rate","USD Rate","Total NPR","Total USD"];
-    row.forEach((cell, i) => {
-        const div = document.createElement("div");
-        div.innerHTML = `<strong>${labels[i]}:</strong> ${cell}`;
-        card.appendChild(div);
+    // ================= FILTER =================
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const col = btn.dataset.col;
+            const val = prompt("Enter filter value:");
+
+            if (!val) return;
+
+            rows.forEach(row => {
+                const cell = row.cells[col].innerText.toLowerCase();
+                row.style.display = cell.includes(val.toLowerCase()) ? "" : "none";
+            });
+
+            calculateTotals();
+        });
     });
-    cardContainer.appendChild(card);
+
+    // ================= RESET =================
+    window.resetFilters = function () {
+        rows.forEach(row => row.style.display = "");
+        searchInput.value = "";
+        calculateTotals();
+    };
 });

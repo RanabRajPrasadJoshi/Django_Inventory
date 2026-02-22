@@ -20,7 +20,8 @@
 
             <div class="content-header">
                 <h2>Item List</h2>
-                <span>Search using code: <input type="search" name="" id="" placeholder="HJ12jK"></span>
+                <span>Search using code: <input type="search" id="searchInput" placeholder="Search...">
+</span>
                 <button class="reset-button" onclick="resetFilters()">Reset Filters</button>
             </div>
 
@@ -29,39 +30,52 @@
                     <thead>
                         <tr>
                             
-                            <th>
-                                
-                                <div class="filter-dropdown" data-index="{{ forloop.counter0 }}">
-                                    <button class="filter-button" onclick="toggleDropdown(event)">Filter</button>
-                                    <div class="dropdown-content">
-                                        <label><input type="checkbox" value="">All</label>
-                                    </div>
-                                </div>
-                            </th>
-                            <th>Code</th>
-                            <th>Category</th>
-                            <th>Product Name</th>
-                            <th>Quantity</th>
-                            <th>Market Price</th>
-                            <th>Total (Market)</th>
-                            <th>Cost Price</th>
-                            <th>Total (Cost)</th>
+                            <thead>
+<tr>
+    <th>Sn</th>
+    <th>Code <button class="filter-btn" data-col="1">🔽</button></th>
+    <th>Category <button class="filter-btn" data-col="2">🔽</button></th>
+    <th>Product <button class="filter-btn" data-col="3">🔽</button></th>
+    <th>Store <button class="filter-btn" data-col="4">🔽</button></th>
+    <th>Qty <button class="filter-btn" data-col="5">🔽</button></th>
+    <th>MP <button class="filter-btn" data-col="6">🔽</button></th>
+    <th>Total MP</th>
+    <th>CP <button class="filter-btn" data-col="8">🔽</button></th>
+    <th>Total CP</th>
+</tr>
+</thead>
                             
                         </tr>
                     </thead>
                     <tbody>
+{% for item in inventory %}
+<tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ item.product.product_code }}</td>
+    <td>{{ item.product.category.category_name }}</td>
+    <td>{{ item.product.product_name }}</td>
+    <td>{{ item.store.store_name }}</td>
+    <td>{{ item.quantity }}</td>
 
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="4" class="total-label">Total</td>
-                            <td id="totalQuantity"></td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td id="totalNPR"></td>
-                            <td id="totalUSD"></td>
-                        </tr>
-                    </tfoot>
+    <td>{{ item.market_price|default:0 }}</td>
+    <td>{{ item.total_market|default:0 }}</td>
+
+    <td>{{ item.cost_price|default:0 }}</td>
+    <td>{{ item.total_cost|default:0 }}</td>
+</tr>
+{% endfor %}
+</tbody>
+
+<tfoot>
+<tr>
+    <td colspan="5" class="total-label">Total</td>
+    <td id="totalQuantity"></td>
+    <td>-</td>
+    <td id="totalMarket"></td>
+    <td>-</td>
+    <td id="totalCost"></td>
+</tr>
+</tfoot>
                 </table>
             </div>
 

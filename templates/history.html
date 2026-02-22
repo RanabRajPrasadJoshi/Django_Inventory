@@ -8,14 +8,16 @@
 
         <div class="content-header">
             <h2>Stock History</h2>
-            <span>Search using code: <input type="search" name="" id=""placeholder="HJ12jK"></span>
+            <span>Search using code: <input type="search" id="searchInput" placeholder="Search...">
+</span>
             <div class="stock_option">
                 Added For: 
-                <select name="" id="">
-                    <option value="all">All</option>
-                    <option value="baccabiu">Baccabiu Stock History</option>
-                    <option value="others">Others Stock History</option>
-                </select>
+                <select id="addedForFilter">
+    <option value="all">All</option>
+    <option value="baccabiu">Baccabiu Stock History</option>
+    <option value="others">Others Stock History</option>
+</select>
+
             </div>
             <button class="reset-button" onclick="resetFilters()">Reset Filters</button>
         </div>
@@ -23,53 +25,45 @@
         <div class="table-wrapper">
             <table id="historyTable">
                 <thead>
-                    <tr>
-                        {% comment %} Filter button example for SN {% endcomment %}
-                        <th>
-                            SN
-                            <div class="filter-dropdown" data-index="0">
-                                <button class="filter-button" onclick="toggleDropdown(event)">Filter</button>
-                                <div class="dropdown-content">
-                                    <label><input type="checkbox" value="">All</label>
-                                </div>
-                            </div>
-                        </th>
-                        <th>Code</th>
-                        <th>Category</th>
-                        <th>Product Name</th>
-                        <th>Quantity</th>
-                        <th>Market Price</th>
-                        <th>Total (Market)</th>
-                        <th>Cost Price</th>
-                        <th>Total (Cost)</th>
-                        <th>Received Date</th>
-                        <th>Status</th>
-                        <th>Remark</th>
-                        <th>Supplier</th>
-                        <th>Imported For</th>
-                        
-                    </tr>
-                </thead>
+<tr>
+    <th>SN </th>
+    <th>Code <button class="filter-btn" data-col="1">🔽</button></th>
+    <th>Category <button class="filter-btn" data-col="2">🔽</button></th>
+    <th>Product <button class="filter-btn" data-col="3">🔽</button></th>
+    <th>Qty <button class="filter-btn" data-col="4">🔽</button></th>
+    <th>MP <button class="filter-btn" data-col="5">🔽</button></th>
+    <th>Total MP</th>
+    <th>CP <button class="filter-btn" data-col="7">🔽</button></th>
+    <th>Total CP</th>
+    <th>Date <button class="filter-btn" data-col="9">🔽</button></th>
+    <th>Status <button class="filter-btn" data-col="10">🔽</button></th>
+    <th>Remark <button class="filter-btn" data-col="11">🔽</button></th>
+    <th>Supplier <button class="filter-btn" data-col="12">🔽</button></th>
+    <th>Imported <button class="filter-btn" data-col="13">🔽</button></th>
+</tr>
+</thead>
+
                 <tbody>
-                    <!-- Example row -->
-                    <tr>
-                        <td data-label="SN">1</td>
-                        <td data-label="Code">PRD001</td>
-                        <td data-label="Category">Electronics</td>
-                        <td data-label="Product Name">Laptop</td>
-                        <td data-label="Quantity">5</td>
-                        <td data-label="Market Price">120000</td>
-                        <td data-label="Total (Market)">600000</td>
-                        <td data-label="Cost Price">110000</td>
-                        <td data-label="Total (Cost)">550000</td>
-                        <td data-label="Received Date">2026-01-22</td>
-                        <td data-label="Status">IN</td>
-                        <td data-label="Remark">New stock</td>
-                        <td data-label="Supplier">Tech Nepal</td>
-                        <td data-label="Imported For">Office</td>
-                        
-                    </tr>
-                </tbody>
+{% for item in transactions %}
+<tr>
+    <td data-label="SN">{{ forloop.counter }}</td>
+    <td data-label="Code">{{ item.product.product_code }}</td>
+    <td data-label="Category">{{ item.product.category.category_name }}</td>
+    <td data-label="Product Name">{{ item.product.product_name }}</td>
+    <td data-label="Quantity">{{ item.quantity }}</td>
+    <td data-label="Market Price">{{ item.market_price }}</td>
+    <td data-label="Total (Market)">{{ item.total_market }}</td>
+    <td data-label="Cost Price">{{ item.cost_price }}</td>
+    <td data-label="Total (Cost)">{{ item.total_cost }}</td>
+    <td data-label="Received Date">{{ item.transaction.received_date }}</td>
+    <td data-label="Status">{{ item.transaction.status }}</td>
+    <td data-label="Remark">{{ item.transaction.remark }}</td>
+    <td data-label="Supplier">{{ item.transaction.supplier }}</td>
+    <td data-label="Imported For">{{ item.transaction.imported_for }}</td>
+</tr>
+{% endfor %}
+</tbody>
+
                 <tfoot>
                     <tr>
                         <td colspan="4" class="total-label">Total</td>
@@ -92,5 +86,102 @@
     </section>
 </main>
 
+
+<script>document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("searchInput");
+    const table = document.getElementById("historyTable");
+    const rows = table.querySelectorAll("tbody tr");
+
+    const totalQty = document.getElementById("totalQuantity");
+    const totalMarket = document.getElementById("totalMarket");
+    const totalCost = document.getElementById("totalCost");
+
+    const addedForFilter = document.getElementById("addedForFilter");
+
+    // ================= TOTALS =================
+    function calculateTotals() {
+        let qty = 0, mp = 0, cp = 0;
+
+        rows.forEach(row => {
+            if (row.style.display !== "none") {
+                qty += parseFloat(row.cells[4].innerText) || 0;
+                mp += parseFloat(row.cells[6].innerText) || 0;
+                cp += parseFloat(row.cells[8].innerText) || 0;
+            }
+        });
+
+        totalQty.innerText = qty;
+        totalMarket.innerText = mp.toFixed(2);
+        totalCost.innerText = cp.toFixed(2);
+    }
+
+    calculateTotals();
+
+    // ================= APPLY FILTERS =================
+    function applyFilters() {
+        const searchVal = searchInput.value.toLowerCase();
+        const addedVal = addedForFilter.value;
+
+        rows.forEach(row => {
+            let show = true;
+
+            // SEARCH
+            if (!row.innerText.toLowerCase().includes(searchVal)) {
+                show = false;
+            }
+
+            // ADDED FOR
+            if (addedVal !== "all") {
+                const importedFor = row.cells[13].innerText.toLowerCase();
+
+                if (addedVal === "baccabiu") {
+                    if (!(importedFor === "" || importedFor.includes("baccabiu") || importedFor === "none")) {
+                        show = false;
+                    }
+                }
+
+                if (addedVal === "others") {
+                    if (importedFor === "" || importedFor.includes("baccabiu") || importedFor === "none") {
+                        show = false;
+                    }
+                }
+            }
+
+            row.style.display = show ? "" : "none";
+        });
+
+        calculateTotals();
+    }
+
+    // ================= EVENTS =================
+    searchInput.addEventListener("keyup", applyFilters);
+    addedForFilter.addEventListener("change", applyFilters);
+
+    // ================= COLUMN FILTER =================
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const col = btn.dataset.col;
+            const val = prompt("Enter filter value:");
+            if (!val) return;
+
+            rows.forEach(row => {
+                const cell = row.cells[col].innerText.toLowerCase();
+                row.style.display = cell.includes(val.toLowerCase()) ? "" : "none";
+            });
+
+            calculateTotals();
+        });
+    });
+
+    // ================= RESET =================
+    window.resetFilters = function () {
+        rows.forEach(row => row.style.display = "");
+        searchInput.value = "";
+        addedForFilter.value = "all";
+        calculateTotals();
+    };
+});
+
+</script>
 <script src="{% static 'js/history.js' %}"></script>
 {% endblock %}
