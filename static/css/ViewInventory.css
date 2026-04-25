@@ -18,6 +18,28 @@
     border-radius: 6px;
     cursor: pointer;
 }
+.btn {
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.edit-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.btn i {
+    font-size: 14px;
+}
 
 .reset-button:hover {
     background: #dc2626;

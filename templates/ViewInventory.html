@@ -10,6 +10,7 @@
     <meta charset="UTF-8">
     <title>Inventory | Baccabiu</title>
     <link rel="stylesheet" href="{% static 'css/ViewInventory.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
 </head>
 <body>
@@ -62,6 +63,22 @@
 
     <td>{{ item.cost_price|default:0 }}</td>
     <td>{{ item.total_cost|default:0 }}</td>
+
+   <td>
+    <!-- EDIT -->
+    <a href="{% url 'edit_inventory' item.id %}" class="btn edit-btn">
+        <i class="fa-solid fa-pen-to-square"></i>
+    </a>
+
+    <!-- DELETE -->
+    <form action="{% url 'delete_inventory' item.id %}" method="POST" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn delete-btn"
+            onclick="return confirm('Are you sure?');">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+    </form>
+</td>
 </tr>
 {% endfor %}
 </tbody>

@@ -1,4 +1,6 @@
+from datetime import date
 from decimal import Decimal
+from urllib import request
 from django.shortcuts import render, redirect
 from django.db.models import Q
 from inv_data.models import (
@@ -7,6 +9,8 @@ from inv_data.models import (
 )
 from django.db.models import OuterRef, Subquery, F, ExpressionWrapper, DecimalField
 from django.http import HttpResponseBadRequest
+
+import inventory
 
 def index(request):
     product = Product.objects.all()
@@ -254,4 +258,141 @@ def history(request):
 
     return render(request, "history.html", {
         "transactions": transactions
+    })
+
+from django.shortcuts import get_object_or_404
+
+def edit_inventory(request, id):
+    inventory = get_object_or_404(Inventory, id=id)
+    products = Product.objects.all()
+    categories = Category.objects.all()
+    stores = Store.objects.all()
+    last_item = StockTransactionItem.objects.filter(
+    product=inventory.product
+).order_by("-id").first()
+
+    if request.method == "POST":
+        # OLD VALUES
+        old_qty = inventory.quantity
+        old_store = inventory.store
+        old_product = inventory.product
+
+        # NEW VALUES
+        new_qty = int(request.POST.get("quantity"))
+        new_store = Store.objects.get(id=request.POST.get("store"))
+        new_product = Product.objects.get(id=request.POST.get("product"))
+
+        cost_price = request.POST.get("cost_price")
+        market_price = request.POST.get("market_price")
+        received_date = request.POST.get("received_date")
+
+        # ---------------- TRANSACTION ----------------
+        transaction = StockTransaction.objects.create(
+            status="edit",
+            remark="Full inventory edit",
+            received_date=received_date  # ✅ REQUIRED FIX
+        )
+
+        # ---------------- CASE 1: SAME PRODUCT & STORE ----------------
+        if old_product == new_product and old_store == new_store:
+            diff = new_qty - old_qty
+
+            inventory.quantity = new_qty
+            inventory.save()
+
+        # ---------------- CASE 2: STORE CHANGED ----------------
+        elif old_product == new_product and old_store != new_store:
+            # remove from old
+            inventory.quantity -= old_qty
+            inventory.save()
+
+            # add to new
+            new_inv, _ = Inventory.objects.get_or_create(
+                product=new_product,
+                store=new_store,
+                defaults={"quantity": 0}
+            )
+            new_inv.quantity += new_qty
+            new_inv.save()
+
+            diff = new_qty  # treated as transfer
+
+        # ---------------- CASE 3: PRODUCT CHANGED ----------------
+        else:
+            # remove old
+            inventory.quantity -= old_qty
+            inventory.save()
+
+            # add new product
+            new_inv, _ = Inventory.objects.get_or_create(
+                product=new_product,
+                store=new_store,
+                defaults={"quantity": 0}
+            )
+            new_inv.quantity += new_qty
+            new_inv.save()
+
+            diff = new_qty
+
+        # ---------------- HISTORY ENTRY ----------------
+        StockTransactionItem.objects.create(
+            transaction=transaction,
+            product=new_product,
+            quantity=diff,
+            cost_price=cost_price or None,
+            market_price=market_price or None,
+            total_cost=(float(cost_price or 0) * new_qty) if cost_price else None,
+            total_market=(float(market_price or 0) * new_qty) if market_price else None,
+            from_location=old_store.store_name,
+            to_location=new_store.store_name,
+        )
+
+        return redirect("viewInventory")
+
+    return render(request, "edit_inventory.html", {
+    "inventory": inventory,
+    "categories": categories,
+    "stores": stores,
+    "products": products,
+    "last_item": last_item,   
+})
+
+def delete_inventory(request, id):
+    inventory = get_object_or_404(Inventory, id=id)
+
+    if request.method == "POST":
+        qty = inventory.quantity
+
+        # ✅ CREATE HISTORY BEFORE DELETE
+        from datetime import date
+
+        received_date = request.POST.get("received_date") or date.today()
+
+        transaction = StockTransaction.objects.create(
+        status="delete",
+        remark="Inventory deleted",
+        received_date=received_date
+        )
+        last_item = StockTransactionItem.objects.filter(
+            product=inventory.product
+        ).order_by("-id").first()
+
+        StockTransactionItem.objects.create(
+            
+            transaction=transaction,
+            product=inventory.product,
+            quantity=-qty,  # removed
+            cost_price=last_item.cost_price if last_item else None,
+            market_price=last_item.market_price if last_item else None,
+            total_cost=(last_item.cost_price or 0) * qty if last_item else None,
+            total_market=(last_item.market_price or 0) * qty if last_item else None,
+            from_location=inventory.store.store_name
+        )
+
+        inventory.delete()
+
+        return redirect("viewInventory")
+
+    return render(request, "confirm_delete.html", {
+        "inventory": inventory
     })
